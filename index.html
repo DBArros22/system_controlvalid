@@ -3,126 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Validades - Dashboard</title>
+    <title>MundiVal - Controle de Validades</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Tela de Login / Cadastro -->
-    <div id="auth-container" class="auth-container">
-        <div class="auth-box" id="login-box">
-            <h2>Acessar Sistema</h2>
-            <form id="form-login">
-                <div class="form-group">
-                    <label for="login-email">E-mail</label>
-                    <input type="email" id="login-email" required placeholder="seu@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="login-senha">Senha</label>
-                    <input type="password" id="login-senha" required placeholder="******">
-                </div>
-                <button type="submit" class="btn-primary">Entrar</button>
-                <div class="auth-links">
-                    <a href="#" id="link-ir-cadastro">Criar nova conta</a> | 
-                    <a href="#" id="link-esqueci-senha">Esqueci a senha</a>
-                </div>
-            </form>
-        </div>
 
-        <div class="auth-box hidden" id="cadastro-box">
-            <h2>Criar Conta</h2>
-            <form id="form-cadastro">
-                <div class="form-group">
-                    <label for="cad-nome">Nome Completo</label>
-                    <input type="text" id="cad-nome" required placeholder="João Silva">
-                </div>
-                <div class="form-group">
-                    <label for="cad-matricula">Matrícula</label>
-                    <input type="text" id="cad-matricula" required placeholder="Ex: 2026XYZ">
-                </div>
-                <div class="form-group">
-                    <label for="cad-email">E-mail</label>
-                    <input type="email" id="cad-email" required placeholder="seu@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="cad-senha">Senha</label>
-                    <input type="password" id="cad-senha" required placeholder="Mínimo 6 caracteres">
-                </div>
-                <button type="submit" class="btn-success">Registrar</button>
-                <div class="auth-links">
-                    <a href="#" id="link-ir-login">Já tenho conta (Login)</a>
-                </div>
-            </form>
-        </div>
+    <div id="auth-screen" class="auth-container">
+        <div class="auth-box">
+            <div class="logo-area">
+                <h2>MundiVal</h2>
+                <p>Controle de Validades Inteligente</p>
+            </div>
+            
+            <div id="login-box">
+                <h3>Aceder ao Sistema</h3>
+                <input type="text" id="login-matricula" placeholder="Matrícula">
+                <input type="password" id="login-senha" placeholder="Senha">
+                <button class="btn-primary" onclick="fazerLogin()">Entrar</button>
+                <p class="auth-switch">Precisa de conta gestor? <span class="link" onclick="alternarAuth(true)">Cadastre-se</span></p>
+            </div>
 
-        <div class="auth-box hidden" id="recuperar-box">
-            <h2>Recuperar Senha</h2>
-            <p class="auth-instruction">Insira seu e-mail cadastrado para receber suas credenciais.</p>
-            <form id="form-recuperar">
-                <div class="form-group">
-                    <label for="rec-email">E-mail Cadastrado</label>
-                    <input type="email" id="rec-email" required placeholder="seu@email.com">
-                </div>
-                <button type="submit" class="btn-warning">Recuperar Credenciais</button>
-                <div class="auth-links">
-                    <a href="#" id="link-voltar-login">Voltar para o Login</a>
-                </div>
-            </form>
+            <div id="register-box" class="hidden">
+                <h3>Novo Gestor (Coord/Gerente)</h3>
+                <input type="text" id="reg-matricula" placeholder="Matrícula">
+                <input type="text" id="reg-nome" placeholder="Nome Completo">
+                <input type="email" id="reg-email" placeholder="E-mail (Recuperação)">
+                <input type="password" id="reg-senha" placeholder="Senha">
+                <button class="btn-primary" onclick="cadastrarUsuario()">Criar Conta</button>
+                <p class="auth-switch">Já tem conta? <span class="link" onclick="alternarAuth(false)">Voltar ao Login</span></p>
+            </div>
         </div>
     </div>
 
-    <!-- Dashboard Principal (Oculto antes do Login) -->
-    <div id="main-dashboard" class="container hidden">
-        <header>
-            <div class="user-profile">
-                <span>Bem-vindo, <strong id="user-display-name">Usuário</strong> (Matrícula: <span id="user-display-mat"></span>)</span>
-                <button id="btn-logout" class="btn-logout">Sair do Sistema</button>
+    <div id="app-screen" class="app-container hidden">
+        <header class="main-header">
+            <div class="header-brand">
+                <h1>MundiVal</h1>
             </div>
-            <h1>Sistema de Controle de Validades Inteligente</h1>
-            <p>Sincronizado em tempo real com o Google Sheets</p>
+            <div id="user-profile" class="user-profile">
+                <div class="user-meta">
+                    <span id="txt-nome-usuario"><strong>Nome</strong></span>
+                    <span id="txt-perfil-usuario" class="badge">PERFIL</span>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-header btn-header-pwd" onclick="abrirModalSenha()">🔒 Alterar Senha</button>
+                    <button class="btn-header btn-header-logout" onclick="deslogar()">🚪 Sair</button>
+                </div>
+            </div>
         </header>
 
-        <div class="alerts-section">
-            <div class="card-alert alert-vencido">
-                <h3>🚨 Vencidos ou Vencendo Hoje</h3>
-                <ul id="lista-vencidos"><li>Nenhum produto crítico.</li></ul>
-            </div>
-            <div class="card-alert alert-atencao">
-                <h3>⚠️ Alerta (Vencem nos próximos 7 dias)</h3>
-                <ul id="lista-atencao"><li>Nenhum produto em atenção.</li></ul>
+        <div id="alert-section" class="alert-banner hidden">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <h4>Produtos Próximos do Vencimento!</h4>
+                <ul id="lista-alertas"></ul>
             </div>
         </div>
 
-        <div class="content-layout">
-            <div class="form-box">
-                <h3>Cadastrar Produto</h3>
-                <br>
-                <form id="form-produto">
-                    <div class="form-group">
-                        <label for="nome">Nome do Produto</label>
-                        <input type="text" id="nome" required placeholder="Ex: Caixa de Leite">
+        <div id="menu-screen" class="menu-grid">
+            <div class="menu-card" onclick="navegarPara('cadastro')">
+                <div class="card-icon">➕</div>
+                <h3>Registro de Produtos</h3>
+                <p>Inserir novos lotes e visualizar a lista completa da base de dados.</p>
+            </div>
+            <div class="menu-card" onclick="navegarPara('consulta')">
+                <div class="card-icon">🔍</div>
+                <h3>Consulta & Baixas</h3>
+                <p>Pesquisar informações detalhadas e efetuar retiradas de estoque.</p>
+            </div>
+        </div>
+
+        <div id="screen-cadastro" class="sub-screen hidden">
+            <button class="btn-back" onclick="navegarPara('menu')">← Voltar ao Menu</button>
+            
+            <div class="card" id="area-cadastro">
+                <h3 id="titulo-formulario-cadastro">Registrar / Atualizar Entrada de Lote</h3>
+                <form id="form-produto" onsubmit="salvarProduto(event)">
+                    <input type="hidden" id="prod-id-edicao">
+                    
+                    <div class="form-row">
+                        <div class="form-group form-group-codigo">
+                            <label>Código Interno:</label>
+                            <input type="text" id="prod-codigo" oninput="buscarProdutoPorCodigo()" placeholder="00000" maxlength="5" required>
+                        </div>
+                        <div class="form-group form-group-descricao">
+                            <label>Descrição:</label>
+                            <input type="text" id="prod-descricao" placeholder="Preenchido automaticamente pela base" readonly required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="validade">Data de Validade</label>
-                        <input type="date" id="validade" required>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Setor:</label>
+                            <select id="prod-setor" onchange="atualizarSubsetores()" required>
+                                <option value="">Selecione...</option>
+                                <option value="Perecíveis">Perecíveis</option>
+                                <option value="Mercearia">Mercearia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Sub-setor:</label>
+                            <select id="prod-subsetor" required>
+                                <option value="">Escolha um setor primeiro...</option>
+                            </select>
+                        </div>
                     </div>
-                    <button type="submit" id="btn-salvar">Salvar no Banco</button>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Validade:</label>
+                            <input type="date" id="prod-validade" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Lote:</label>
+                            <input type="text" id="prod-lote" placeholder="Ex: L20" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Qtd:</label>
+                            <input type="number" id="prod-qtd" min="1" required>
+                        </div>
+                    </div>
+                    <button type="submit" id="btn-gravar-cadastro" class="btn-primary btn-orange">Gravar Lote</button>
+                    <button type="button" id="btn-cancelar-edicao" class="btn-primary hidden" style="background:#64748b; margin-top: 8px;" onclick="cancelarEdicao()">Cancelar Edição</button>
                 </form>
             </div>
 
-            <div class="table-box">
-                <h3>Estoque Geral</h3>
-                <div id="loading" class="loading">Carregando dados do Google Sheets...</div>
-                <table id="tabela-produtos" style="margin-top: 15px;">
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th>Data de Validade</th>
-                            <th>Dias Restantes</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="card">
+                <h3>Todos os Produtos no Sistema</h3>
+                
+                <div class="search-container" style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="text" id="busca-codigo-tabela" placeholder="🔍 Pesquisar código interno..." style="margin: 0;">
+                    <button class="btn-primary" style="width: auto; padding: 0 20px;" onclick="filtrarTabelaCadastro()">Buscar</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Cód</th>
+                                <th>Descrição</th>
+                                <th>Validade / Estado</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-todos-produtos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-consulta" class="sub-screen hidden">
+            <button class="btn-back" onclick="navegarPara('menu')">← Voltar ao Menu</button>
+            <div class="card">
+                <h3>Categorias de Monitorização</h3>
+                <div id="lista-secoes-interativas"></div>
+            </div>
+        </div>
+
+        <div id="screen-produtos-subsetor" class="sub-screen hidden">
+            <button class="btn-back" onclick="navegarPara('consulta')">← Voltar às Seções</button>
+            <div class="card">
+                <h3 id="titulo-secao-atual">Produtos</h3>
+                <div id="container-produtos-filtrados"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3 id="modal-title">Aviso</h3>
+            <p id="modal-message">Mensagem do sistema.</p>
+            <button class="btn-primary" onclick="fecharModal()">OK</button>
+        </div>
+    </div>
+
+    <div id="password-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>Alterar Senha</h3>
+            <p style="font-size:13px; margin-bottom:10px; color:#555;">Digite a sua nova senha de acesso:</p>
+            <input type="password" id="modal-new-password" placeholder="Nova senha">
+            <div style="display:flex; gap:10px;">
+                <button class="btn-primary" onclick="processarAlterarSenha()">Confirmar</button>
+                <button class="btn-primary btn-orange" onclick="fecharModalSenha()">Cancelar</button>
             </div>
         </div>
     </div>
