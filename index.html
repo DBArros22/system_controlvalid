@@ -3,221 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Validades Robusto</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; padding: 20px; }
-        .container { max-width: 1100px; margin: 0 auto; }
-        header { margin-bottom: 30px; text-align: center; }
-        h1 { color: #2c3e50; margin-bottom: 10px; }
-        
-        /* Painel de Alertas */
-        .alerts-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-        .card-alert { padding: 15px; border-radius: 8px; color: #fff; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .alert-vencido { background-color: #e74c3c; }
-        .alert-atencao { background-color: #f39c12; }
-        .card-alert h3 { margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 4px; }
-        .card-alert ul { list-style: none; font-weight: normal; font-size: 14px; max-height: 120px; overflow-y: auto; }
-
-        /* Formulário e Tabela */
-        .content-layout { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
-        .form-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        button { width: 100%; padding: 12px; background: #2ecc71; border: none; color: white; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #27ae60; }
-
-        .table-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th, td { padding: 12px 15px; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; color: #555; }
-        
-        /* Badges de status na tabela */
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; }
-        .badge-vencido { background-color: #fde8e8; color: #e74c3c; }
-        .badge-critico { background-color: #fef3c7; color: #d97706; }
-        .badge-ok { background-color: #def7ec; color: #03543f; }
-        
-        .loading { text-align: center; font-weight: bold; color: #7f8c8d; margin: 20px 0; }
-    </style>
+    <title>Controle de Validades - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="container">
-    <header>
-        <h1>Sistema de Controle de Validades Inteligente</h1>
-        <p>Sincronizado em tempo real com o Google Sheets</p>
-    </header>
-
-    <div class="alerts-section">
-        <div class="card-alert alert-vencido">
-            <h3>🚨 Vencidos ou Vencendo Hoje</h3>
-            <ul id="lista-vencidos"><li>Nenhum produto crítico.</li></ul>
-        </div>
-        <div class="card-alert alert-atencao">
-            <h3>⚠️ Alerta (Vencem nos próximos 7 dias)</h3>
-            <ul id="lista-atencao"><li>Nenhum produto em atenção.</li></ul>
-        </div>
-    </div>
-
-    <div class="content-layout">
-        <div class="form-box">
-            <h3>Cadastrar Produto</h3>
-            <br>
-            <form id="form-produto">
+    <!-- Tela de Login / Cadastro -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-box" id="login-box">
+            <h2>Acessar Sistema</h2>
+            <form id="form-login">
                 <div class="form-group">
-                    <label for="nome">Nome do Produto</label>
-                    <input type="text" id="nome" required placeholder="Ex: Caixa de Leite">
+                    <label for="login-email">E-mail</label>
+                    <input type="email" id="login-email" required placeholder="seu@email.com">
                 </div>
                 <div class="form-group">
-                    <label for="validade">Data de Validade</label>
-                    <input type="date" id="validade" required>
+                    <label for="login-senha">Senha</label>
+                    <input type="password" id="login-senha" required placeholder="******">
                 </div>
-                <button type="submit" id="btn-salvar">Salvar no Banco</button>
+                <button type="submit" class="btn-primary">Entrar</button>
+                <div class="auth-links">
+                    <a href="#" id="link-ir-cadastro">Criar nova conta</a> | 
+                    <a href="#" id="link-esqueci-senha">Esqueci a senha</a>
+                </div>
             </form>
         </div>
 
-        <div class="table-box">
-            <h3>Estoque Geral</h3>
-            <div id="loading" class="loading" style="display: none;">Carregando dados do Google Sheets...</div>
-            <table id="tabela-produtos" style="margin-top: 15px;">
-                <thead>
-                    <tr>
-                        <th>Produto</th>
-                        <th>Data de Validade</th>
-                        <th>Dias Restantes</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
+        <div class="auth-box hidden" id="cadastro-box">
+            <h2>Criar Conta</h2>
+            <form id="form-cadastro">
+                <div class="form-group">
+                    <label for="cad-nome">Nome Completo</label>
+                    <input type="text" id="cad-nome" required placeholder="João Silva">
+                </div>
+                <div class="form-group">
+                    <label for="cad-matricula">Matrícula</label>
+                    <input type="text" id="cad-matricula" required placeholder="Ex: 2026XYZ">
+                </div>
+                <div class="form-group">
+                    <label for="cad-email">E-mail</label>
+                    <input type="email" id="cad-email" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="cad-senha">Senha</label>
+                    <input type="password" id="cad-senha" required placeholder="Mínimo 6 caracteres">
+                </div>
+                <button type="submit" class="btn-success">Registrar</button>
+                <div class="auth-links">
+                    <a href="#" id="link-ir-login">Já tenho conta (Login)</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="auth-box hidden" id="recuperar-box">
+            <h2>Recuperar Senha</h2>
+            <p class="auth-instruction">Insira seu e-mail cadastrado para receber suas credenciais.</p>
+            <form id="form-recuperar">
+                <div class="form-group">
+                    <label for="rec-email">E-mail Cadastrado</label>
+                    <input type="email" id="rec-email" required placeholder="seu@email.com">
+                </div>
+                <button type="submit" class="btn-warning">Recuperar Credenciais</button>
+                <div class="auth-links">
+                    <a href="#" id="link-voltar-login">Voltar para o Login</a>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<script>
-    // 💡 COLE A URL DA SUA IMPLANTAÇÃO DO GOOGLE APPS SCRIPT AQUI:
-    const API_URL = "SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI";
+    <!-- Dashboard Principal (Oculto antes do Login) -->
+    <div id="main-dashboard" class="container hidden">
+        <header>
+            <div class="user-profile">
+                <span>Bem-vindo, <strong id="user-display-name">Usuário</strong> (Matrícula: <span id="user-display-mat"></span>)</span>
+                <button id="btn-logout" class="btn-logout">Sair do Sistema</button>
+            </div>
+            <h1>Sistema de Controle de Validades Inteligente</h1>
+            <p>Sincronizado em tempo real com o Google Sheets</p>
+        </header>
 
-    const form = document.getElementById('form-produto');
-    const loadingEl = document.getElementById('loading');
-    const tbody = document.querySelector('#tabela-produtos tbody');
-    const listaVencidos = document.getElementById('lista-vencidos');
-    const listaAtencao = document.getElementById('lista-atencao');
+        <div class="alerts-section">
+            <div class="card-alert alert-vencido">
+                <h3>🚨 Vencidos ou Vencendo Hoje</h3>
+                <ul id="lista-vencidos"><li>Nenhum produto crítico.</li></ul>
+            </div>
+            <div class="card-alert alert-atencao">
+                <h3>⚠️ Alerta (Vencem nos próximos 7 dias)</h3>
+                <ul id="lista-atencao"><li>Nenhum produto em atenção.</li></ul>
+            </div>
+        </div>
 
-    // Função para buscar dados da Planilha
-    async function buscarProdutos() {
-        if(API_URL.includes("SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI")) return;
-        loadingEl.style.display = "block";
-        tbody.innerHTML = "";
-        
-        try {
-            const response = await fetch(API_URL);
-            const produtos = await response.json();
-            processarValidades(produtos);
-        } catch (error) {
-            console.error("Erro ao buscar dados:", error);
-            alert("Erro ao conectar com o banco de dados.");
-        } finally {
-            loadingEl.style.display = "none";
-        }
-    }
+        <div class="content-layout">
+            <div class="form-box">
+                <h3>Cadastrar Produto</h3>
+                <br>
+                <form id="form-produto">
+                    <div class="form-group">
+                        <label for="nome">Nome do Produto</label>
+                        <input type="text" id="nome" required placeholder="Ex: Caixa de Leite">
+                    </div>
+                    <div class="form-group">
+                        <label for="validade">Data de Validade</label>
+                        <input type="date" id="validade" required>
+                    </div>
+                    <button type="submit" id="btn-salvar">Salvar no Banco</button>
+                </form>
+            </div>
 
-    // Processa datas, renderiza a tabela e atualiza os cards de notificação
-    function processarValidades(produtos) {
-        listaVencidos.innerHTML = "";
-        listaAtencao.innerHTML = "";
-        
-        let totalVencidosHoje = 0;
-        let totalAtencao = 0;
+            <div class="table-box">
+                <h3>Estoque Geral</h3>
+                <div id="loading" class="loading">Carregando dados do Google Sheets...</div>
+                <table id="tabela-produtos" style="margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Data de Validade</th>
+                            <th>Dias Restantes</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-        // Pega a data de hoje zerando as horas para comparação justa
-        const hoje = new Date();
-        hoje.setHours(0,0,0,0);
-
-        produtos.forEach(p => {
-            // Corrige fuso horário local na conversão da string do input/banco
-            const dataValidade = new Date(p.validade + 'T00:00:00');
-            
-            // Calcula diferença em dias
-            const diferencaTempo = dataValidade.getTime() - hoje.getTime();
-            const diferencaDias = Math.ceil(diferencaTempo / (1000 * 60 * 60 * 24));
-
-            let statusText = "";
-            let badgeClass = "";
-            let formatarData = dataValidade.toLocaleDateString('pt-BR');
-
-            if (diferencaDias < 0) {
-                statusText = "Vencido";
-                badgeClass = "badge-vencido";
-                listaVencidos.innerHTML += `<li>❌ ${p.produto} (Venceu em ${formatarData})</li>`;
-                totalVencidosHoje++;
-            } else if (diferencaDias === 0) {
-                statusText = "VENCE HOJE!";
-                badgeClass = "badge-vencido";
-                listaVencidos.innerHTML += `<li>🚨 Atenção: ${p.produto} vence HOJE!</li>`;
-                totalVencidosHoje++;
-            } else if (diferencaDias <= 7) {
-                statusText = "Risco Crítico";
-                badgeClass = "badge-critico";
-                listaAtencao.innerHTML += `<li>⚠️ ${p.produto} vence em ${diferencaDias} dias (${formatarData})</li>`;
-                totalAtencao++;
-            } else {
-                statusText = "Em dia";
-                badgeClass = "badge-ok";
-            }
-
-            // Cria linha da tabela
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>${p.produto}</strong></td>
-                <td>${formatarData}</td>
-                <td>${diferencaDias < 0 ? `Vencido há ${Math.abs(diferencaDias)} dias` : diferencaDias === 0 ? 'Vence hoje' : `${diferencaDias} dias restantes`}</td>
-                <td><span class="badge ${badgeClass}">${statusText}</span></td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        if(totalVencidosHoje === 0) listaVencidos.innerHTML = "<li>Nenhum produto crítico ou vencido hoje. 🎉</li>";
-        if(totalAtencao === 0) listaAtencao.innerHTML = "<li>Nenhum produto vencendo nos próximos 7 dias.</li>";
-    }
-
-    // Evento de Envio do Formulário (Salvar no Sheets)
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btn-salvar');
-        
-        const produto = document.getElementById('nome').value;
-        const validade = document.getElementById('validade').value;
-
-        btn.disabled = true;
-        btn.innerText = "Salvando...";
-
-        try {
-            await fetch(API_URL, {
-                method: "POST",
-                mode: "no-cors", // Necessário para evitar erros de CORS com o Apps Script
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "add", produto, validade })
-            });
-
-            form.reset();
-            alert("Produto enviado com sucesso! Atualizando...");
-            // Timeout leve para dar tempo do Google Sheets registrar a linha
-            setTimeout(buscarProdutos, 1500); 
-        } catch (error) {
-            console.error("Erro ao salvar:", error);
-            alert("Falha ao salvar produto.");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Salvar no Banco";
-        }
-    });
-
-    // Inicializa buscando os registros salvos
-    buscarProdutos();
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
